@@ -12,6 +12,7 @@ from routes import (
     chat_router,
     habits_router,
     running_router,
+    heart_rate_router,
 )
 import os
 from dotenv import load_dotenv
@@ -22,34 +23,27 @@ load_dotenv()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    Application lifespan events - startup and shutdown.
-    """
-    # Startup
+    """Application lifespan events - startup and shutdown."""
     logger.info("Starting Daily Pulse Backend...")
-    
-    # Initialize database
+
     try:
         await init_db()
         logger.info("Database tables created successfully")
     except Exception as e:
         logger.error(f"Failed to initialize database: {e}")
         raise
-    
-    # Check database connection
+
     db_healthy = await check_db_connection()
     if db_healthy:
         logger.info("Database connection healthy")
     else:
         logger.warning("Database connection failed - running without database")
-    
+
     yield
-    
-    # Shutdown
+
     logger.info("Shutting down Daily Pulse Backend...")
 
 
-# Create FastAPI app
 app = FastAPI(
     title="Daily Pulse API",
     description="Backend API for Daily Pulse health tracking app",
@@ -59,7 +53,6 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8080").split(","),
@@ -68,18 +61,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
 app.include_router(auth_router)
 app.include_router(logs_router)
 app.include_router(insights_router)
 app.include_router(chat_router)
 app.include_router(habits_router)
 app.include_router(running_router)
+app.include_router(heart_rate_router)
 
 
 @app.get("/")
 async def root():
-    """Root endpoint - API info"""
+    """Root endpoint - API info."""
     return {
         "name": "Daily Pulse API",
         "version": "1.0.0",
@@ -90,9 +83,7 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """
-    Health check endpoint.
-    """
+    """Health check endpoint."""
     db_healthy = await check_db_connection()
     return {
         "status": "healthy" if db_healthy else "degraded",

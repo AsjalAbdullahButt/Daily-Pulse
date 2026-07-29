@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.database import get_db
 from models.user import User
-from schemas.chat import HabitStreakCreate, HabitStreakUpdate, HabitStreakResponse
+from schemas.habit_streak import HabitStreakCreate, HabitStreakUpdate, HabitStreakResponse
 from services.auth import get_current_user
 from services.habit_service import habit_service
 from typing import List
@@ -18,9 +18,7 @@ async def get_habits(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Get all habits for current user.
-    """
+    """Get all habits for current user."""
     habits = await habit_service.get_user_habits(db, current_user.id)
     return [HabitStreakResponse.model_validate(h) for h in habits]
 
@@ -31,9 +29,7 @@ async def create_habit(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Create a new habit to track.
-    """
+    """Create a new habit to track."""
     habit = await habit_service.create_habit(
         db=db,
         user_id=current_user.id,
@@ -50,9 +46,7 @@ async def update_habit(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Update a habit's details.
-    """
+    """Update a habit's details."""
     habit = await habit_service.update_habit(
         db=db,
         habit_id=habit_id,
@@ -60,13 +54,13 @@ async def update_habit(
         habit_name=habit_update.habit_name,
         target_frequency=habit_update.target_frequency,
     )
-    
+
     if not habit:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Habit not found"
         )
-    
+
     return HabitStreakResponse.model_validate(habit)
 
 
@@ -76,11 +70,9 @@ async def delete_habit(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Delete a habit.
-    """
+    """Delete a habit."""
     success = await habit_service.delete_habit(db, habit_id, current_user.id)
-    
+
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -94,19 +86,17 @@ async def mark_habit_complete(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Mark a habit as completed for today.
-    """
+    """Mark a habit as completed for today."""
     habit = await habit_service.mark_habit_complete(
         db=db,
         habit_id=habit_id,
         user_id=current_user.id,
     )
-    
+
     if not habit:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Habit not found"
         )
-    
+
     return HabitStreakResponse.model_validate(habit)

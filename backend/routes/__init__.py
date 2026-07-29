@@ -5,6 +5,7 @@ from routes.insights import router as insights_router
 from routes.chat import router as chat_router
 from routes.habits import router as habits_router
 from routes.running import router as running_router
+from routes.heart_rate import router as heart_rate_router
 
 __all__ = [
     "auth_router",
@@ -13,4 +14,5 @@ __all__ = [
     "chat_router",
     "habits_router",
     "running_router",
+    "heart_rate_router",
 ]
