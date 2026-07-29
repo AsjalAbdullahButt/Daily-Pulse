@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: daily_pulse_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-daily_pulse}
+      MYSQL_USER: ${MYSQL_USER:-daily_pulse_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-daily_pulse_pass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - daily_pulse_network
+
+  # Redis Cache (Optional)
+  redis:
+    image: redis:7-alpine
+    container_name: daily_pulse_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - daily_pulse_network
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: daily_pulse_backend
+    environment:
+      - DATABASE_URL=mysql+asyncmy://${MYSQL_USER:-daily_pulse_user}:${MYSQL_PASSWORD:-daily_pulse_pass}@mysql:3306/${MYSQL_DATABASE:-daily_pulse}
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${SECRET_KEY:-your-super-secret-key}
+      - REFRESH_SECRET_KEY=${REFRESH_SECRET_KEY:-your-refresh-secret-key}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - DEBUG=${DEBUG:-false}
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - daily_pulse_network
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  daily_pulse_network:
+    driver: bridge
