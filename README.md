@@ -51,6 +51,10 @@ Track your daily activities, sleep, nutrition, mood, and workouts — all while 
 - 📊 **Daily/Weekly Reports** — AI-generated health summaries
 - 🎯 **Habit Coaching** — Streak tracking with intelligent suggestions
 
+### ❤️ Heart Rate
+- 📈 **Heart Rate Logging** — Manual or device-synced BPM tracking
+- 📊 **Heart Rate Stats** — Average, min, max, resting heart rate analytics
+
 ---
 
 ## 🏗️ Architecture
@@ -64,7 +68,6 @@ Track your daily activities, sleep, nutrition, mood, and workouts — all while 
 │  │  Flutter App  │◄──►│  FastAPI      │◄──►│  MySQL DB    │      │
 │  │  (Mobile)    │    │  (Backend)   │    │  (Database)  │      │
 │  └──────────────┘    └──────────────┘    └──────────────┘      │
-│         │                   │                    │               │
 │         │                   │                    │               │
 │  ┌──────┴──────┐    ┌──────┴──────┐    ┌──────┴──────┐      │
 │  │   Sensors   │    │   Gemini AI │    │   Redis     │      │
@@ -89,11 +92,9 @@ Track your daily activities, sleep, nutrition, mood, and workouts — all while 
 ## 🛠️ Tech Stack
 
 ### 📱 Frontend (Flutter)
-- `sensors_plus` — Accelerometer for step counting
-- `geolocator` — GPS for running/jogging tracking
-- `dio` — HTTP client for API communication
-- `provider` / `riverpod` — State management
-- `sqflite` — Local database caching
+- `http` — HTTP client for API communication
+- `provider` — State management
+- `intl` — Date/time formatting
 
 ### ⚙️ Backend (FastAPI)
 - `fastapi` — Modern async web framework
@@ -188,44 +189,96 @@ flutter run
 
 ```
 Daily-Pulse/
-├── 📱 flutter_app/              # Flutter mobile application
-│   ├── lib/
-│   │   ├── screens/            # UI screens
-│   │   ├── widgets/            # Reusable widgets
-│   │   ├── services/           # API services
-│   │   ├── models/             # Data models
-│   │   └── providers/          # State management
-│   └── pubspec.yaml
+├── 📱 lib/                      # Flutter mobile application
+│   ├── main.dart                # App entry point
+│   ├── config/
+│   │   └── api_config.dart      # Base URL configuration
+│   ├── models/                  # Data models
+│   │   ├── user.dart
+│   │   ├── daily_log.dart
+│   │   ├── running_session.dart
+│   │   ├── chat.dart
+│   │   ├── habit_streak.dart
+│   │   └── heart_rate_log.dart
+│   ├── services/                # API services
+│   │   ├── api_client.dart      # Shared HTTP wrapper
+│   │   ├── auth_service.dart
+│   │   ├── chat_service.dart
+│   │   ├── logs_service.dart
+│   │   ├── insights_service.dart
+│   │   ├── running_service.dart
+│   │   └── habits_service.dart
+│   ├── providers/               # State management
+│   │   ├── connection_provider.dart
+│   │   ├── auth_provider.dart
+│   │   ├── chat_provider.dart
+│   │   ├── logs_provider.dart
+│   │   └── habits_provider.dart
+│   ├── screens/                 # UI screens
+│   │   ├── home_screen.dart
+│   │   ├── login_screen.dart
+│   │   ├── register_screen.dart
+│   │   ├── dashboard_screen.dart
+│   │   ├── chat_screen.dart
+│   │   ├── running_screen.dart
+│   │   ├── habits_screen.dart
+│   │   ├── insights_screen.dart
+│   │   └── profile_screen.dart
+│   ├── widgets/                 # Reusable UI components
+│   │   ├── stat_card.dart
+│   │   ├── streak_badge.dart
+│   │   └── chat_bubble.dart
+│   ├── theme/
+│   │   └── app_theme.dart       # Colors & typography
+│   └── utils/
+│       ├── formatters.dart      # Date/number formatting
+│       └── validators.dart      # Input validation
 │
 ├── ⚙️ backend/                  # FastAPI backend
-│   ├── 🗄️ database/            # Database configuration
-│   │   └── database.py         # SQLAlchemy async setup
-│   ├── 📦 models/              # SQLAlchemy models
-│   │   ├── user.py             # User model
-│   │   ├── daily_log.py        # Daily health log
-│   │   ├── running_session.py  # Running data
-│   │   ├── chat_history.py     # Chat messages
-│   │   ├── habit_streak.py     # Habit tracking
-│   │   └── heart_rate_log.py   # Heart rate data
-│   ├── 🎯 routes/              # API endpoints
-│   │   ├── auth.py             # Authentication
-│   │   ├── logs.py             # Daily logs
-│   │   ├── running.py          # Running sessions
-│   │   ├── insights.py         # AI insights
-│   │   ├── chat.py             # Chat + WebSocket
-│   │   └── habits.py           # Habit streaks
-│   ├── 🔧 services/            # Business logic
-│   │   ├── auth.py             # JWT + password hashing
-│   │   ├── gemini_service.py   # AI integration
-│   │   ├── insights_service.py # Health analysis
-│   │   ├── habit_service.py    # Streak tracking
-│   │   └── calculation_service.py # Metrics calculation
-│   ├── 📝 schemas/             # Pydantic validation
-│   ├── 📝 prompts/             # AI system prompts
-│   ├── 🐳 Dockerfile          # Docker config
-│   ├── 🐳 docker-compose.yml  # Docker services
-│   ├── 📋 requirements.txt    # Python dependencies
-│   └── 🚀 main.py             # FastAPI entry point
+│   ├── 🗄️ database/
+│   │   └── database.py          # SQLAlchemy async setup
+│   ├── 📦 models/               # SQLAlchemy models
+│   │   ├── user.py
+│   │   ├── daily_log.py
+│   │   ├── running_session.py
+│   │   ├── chat_history.py
+│   │   ├── habit_streak.py
+│   │   └── heart_rate_log.py
+│   ├── 🎯 routes/               # API endpoints
+│   │   ├── auth.py
+│   │   ├── logs.py
+│   │   ├── running.py
+│   │   ├── insights.py
+│   │   ├── chat.py
+│   │   ├── habits.py
+│   │   └── heart_rate.py
+│   ├── 🔧 services/             # Business logic
+│   │   ├── auth.py
+│   │   ├── gemini_service.py
+│   │   ├── insights_service.py
+│   │   ├── habit_service.py
+│   │   └── calculation_service.py
+│   ├── 📝 schemas/              # Pydantic validation
+│   │   ├── user.py
+│   │   ├── daily_log.py
+│   │   ├── running_session.py
+│   │   ├── chat.py
+│   │   ├── habit_streak.py
+│   │   └── heart_rate_log.py
+│   ├── 📝 prompts/              # AI system prompts
+│   ├── 🔀 alembic/              # Database migrations
+│   │   ├── env.py
+│   │   ├── script.py.mako
+│   │   └── versions/
+│   ├── 🧪 tests/                # Pytest test suite
+│   │   ├── conftest.py
+│   │   ├── test_auth.py
+│   │   └── test_health.py
+│   ├── 🐳 Dockerfile
+│   ├── 🐳 docker-compose.yml
+│   ├── 📋 requirements.txt
+│   ├── 🚀 main.py
+│   └── 📝 .env.example
 │
 ├── 📝 .gitignore
 └── 📝 README.md
@@ -264,6 +317,16 @@ Daily-Pulse/
 | `GET` | `/api/running/sessions` | Get all sessions |
 | `GET` | `/api/running/sessions/{id}` | Get specific session |
 | `GET` | `/api/running/stats` | Get running statistics |
+| `DELETE` | `/api/running/sessions/{id}` | Delete session |
+
+### ❤️ Heart Rate
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/heart-rate/` | Log heart rate reading |
+| `GET` | `/api/heart-rate/` | Get heart rate logs |
+| `GET` | `/api/heart-rate/stats` | Get heart rate statistics |
+| `DELETE` | `/api/heart-rate/{id}` | Delete reading |
 
 ### 🤖 AI Insights
 
