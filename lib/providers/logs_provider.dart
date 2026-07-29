@@ -6,7 +6,7 @@ import '../models/daily_log.dart';
 import '../services/logs_service.dart';
 
 class LogsProvider extends ChangeNotifier {
-  final LogsService _service;
+  LogsService _service;
 
   List<DailyLog> _logs = [];
   DailyLog? _todayLog;
@@ -20,7 +20,7 @@ class LogsProvider extends ChangeNotifier {
 
   LogsProvider(this._service);
 
-  // Updates service when ApiClient changes.
+  // Swaps service when API client changes.
   void _updateService(LogsService s) { _service = s; }
 
   // Load today's log.

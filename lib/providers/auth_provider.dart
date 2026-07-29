@@ -1,6 +1,4 @@
-"""
-Auth provider - manages authentication state
-"""
+/// Manages authentication state and user session.
 import 'package:flutter/foundation.dart';
 import '../models/user.dart';
 import '../services/api_client.dart';

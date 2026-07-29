@@ -6,7 +6,7 @@ import '../models/chat.dart';
 import '../services/chat_service.dart';
 
 class ChatProvider extends ChangeNotifier {
-  final ChatService _service;
+  ChatService _service;
 
   List<ChatResponse> _messages = [];
   bool _loading = false;
@@ -18,7 +18,7 @@ class ChatProvider extends ChangeNotifier {
 
   ChatProvider(this._service);
 
-  // Updates service when ApiClient changes.
+  // Swaps service when API client changes.
   void _updateService(ChatService s) { _service = s; }
 
   // Load chat history from backend.

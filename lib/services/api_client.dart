@@ -24,7 +24,7 @@ class ApiClient {
     return _handleResponse(res);
   }
 
-  // Sends POST request with JSON body.
+  // Sends POST request with JSON body data.
   Future<Map<String, dynamic>> post(String path, [Map<String, dynamic>? body]) async {
     final res = await http.post(
       Uri.parse('${ApiConfig.baseUrl}$path'),
@@ -34,7 +34,7 @@ class ApiClient {
     return _handleResponse(res);
   }
 
-  // Sends PUT request with JSON body, returns decoded response.
+  // Sends PUT request with JSON body payload.
   Future<Map<String, dynamic>> put(String path, Map<String, dynamic> body) async {
     final res = await http.put(
       Uri.parse('${ApiConfig.baseUrl}$path'),
@@ -44,7 +44,7 @@ class ApiClient {
     return _handleResponse(res);
   }
 
-  // Sends DELETE request and returns decoded response.
+  // Sends DELETE request to remove resource.
   Future<void> delete(String path) async {
     final res = await http.delete(
       Uri.parse('${ApiConfig.baseUrl}$path'),
@@ -55,7 +55,7 @@ class ApiClient {
     }
   }
 
-  // Sends GET and returns raw decoded list.
+  // Sends GET request and returns decoded list.
   Future<List<dynamic>> getList(String path) async {
     final res = await http.get(
       Uri.parse('${ApiConfig.baseUrl}$path'),

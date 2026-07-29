@@ -6,7 +6,7 @@ import '../models/habit_streak.dart';
 import '../services/habits_service.dart';
 
 class HabitsProvider extends ChangeNotifier {
-  final HabitsService _service;
+  HabitsService _service;
 
   List<HabitStreak> _habits = [];
   bool _loading = false;
@@ -16,7 +16,7 @@ class HabitsProvider extends ChangeNotifier {
 
   HabitsProvider(this._service);
 
-  // Updates service when ApiClient changes.
+  // Swaps service when API client changes.
   void _updateService(HabitsService s) { _service = s; }
 
   // Load all habits.
