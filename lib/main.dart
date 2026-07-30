@@ -1,6 +1,5 @@
-"""
-Daily Pulse - Main entry point with routing and providers
-"""
+// Daily Pulse - Main entry point with routing and providers
+// Starts with SplashScreen, then HomeShell
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'services/api_client.dart';
@@ -13,15 +12,8 @@ import 'providers/chat_provider.dart';
 import 'providers/logs_provider.dart';
 import 'providers/habits_provider.dart';
 import 'theme/app_theme.dart';
-import 'screens/home_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
-import 'screens/dashboard_screen.dart';
-import 'screens/chat_screen.dart';
-import 'screens/running_screen.dart';
-import 'screens/habits_screen.dart';
-import 'screens/insights_screen.dart';
-import 'screens/profile_screen.dart';
+import 'screens/splash_screen.dart';
+import 'screens/home_shell.dart';
 
 void main() => runApp(const DailyPulseApp());
 
@@ -30,7 +22,6 @@ class DailyPulseApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Wraps app so connection state is available everywhere.
     return MultiProvider(
       providers: [
         Provider(create: (_) => ApiClient()),
@@ -41,39 +32,25 @@ class DailyPulseApp extends StatelessWidget {
         ),
         ChangeNotifierProxyProvider<ApiClient, ChatProvider>(
           create: (ctx) => ChatProvider(ChatService(ctx.read<ApiClient>())),
-          update: (_, api, chat) {
-            chat!._updateService(ChatService(api));
-            return chat;
-          },
+          update: (_, api, chat) => chat!,
         ),
         ChangeNotifierProxyProvider<ApiClient, LogsProvider>(
           create: (ctx) => LogsProvider(LogsService(ctx.read<ApiClient>())),
-          update: (_, api, logs) {
-            logs!._updateService(LogsService(api));
-            return logs;
-          },
+          update: (_, api, logs) => logs!,
         ),
         ChangeNotifierProxyProvider<ApiClient, HabitsProvider>(
           create: (ctx) => HabitsProvider(HabitsService(ctx.read<ApiClient>())),
-          update: (_, api, habits) {
-            habits!._updateService(HabitsService(api));
-            return habits;
-          },
+          update: (_, api, habits) => habits!,
         ),
       ],
       child: MaterialApp(
         title: 'Daily Pulse',
-        theme: AppTheme.lightTheme,
-        home: const HomeScreen(),
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.darkTheme,
+        home: const SplashScreen(),
         routes: {
-          '/login': (_) => const LoginScreen(),
-          '/register': (_) => const RegisterScreen(),
-          '/dashboard': (_) => const DashboardScreen(),
-          '/chat': (_) => const ChatScreen(),
-          '/running': (_) => const RunningScreen(),
-          '/habits': (_) => const HabitsScreen(),
-          '/insights': (_) => const InsightsScreen(),
-          '/profile': (_) => const ProfileScreen(),
+          '/splash': (_) => const SplashScreen(),
+          '/home': (_) => const HomeShell(),
         },
       ),
     );
